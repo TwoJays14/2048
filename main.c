@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <raylib.h>
 #include <time.h>
+#include <conio.h>
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -40,7 +41,7 @@ struct Numbers {
 
 void generateRandomNumberFromZeroToThree();
 void printBoard();
-void onGameInit(const char *board[4][4]); // fill board with random tiles with random values
+void onGameInit(char board[4][4]); // fill board with random tiles with random values
 int playerChoice();
 void checkWinningCondition();
 
@@ -55,9 +56,39 @@ char board[4][4] = {
 int main()
 {
     srand(time(0));
+    // int playerSelection = playerChoice();
+    //
+    //
+    // // printf("%d", (int)board[0][2] - '0' + (int)board[3][1] - '0');
+    printBoard(board);
+    // printf("%d", playerSelection);
 
+    int playerSelection;
+    do {
+        onGameInit(board);
+        playerSelection = playerChoice();
+        // Turn calculation function
+        printBoard();
+        // Add your game logic here based on playerSelection
+    } while (playerSelection == 0);
 
     return 0;
+}
+
+
+void printBoard(char board[4][4]) {
+    printf("---------------------\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (board[i][j] == ' ') {
+                printf("|    ");
+            } else {
+                printf("| %c  ", board[i][j]);
+            }
+        }
+        printf("|\n");
+        printf("---------------------\n");
+    }
 }
 
 
@@ -68,3 +99,59 @@ void generateRandomNumberFromZeroToThree() {
         printf("%d", num);
     }
 }
+
+void onGameInit(char board[4][4]) {
+    board[0][2] = '2';
+    board[3][1] = '2';
+
+    // int length = sizeof(board) / sizeof(board[0]);
+
+    // for(int i = 0; i < 4; i++ ) {
+    //     for(int j = 0; j < 4; j++) {
+    //         printf("%c\n", board[i][j]);
+    //     }
+    // }
+}
+
+int playerChoice() {
+    int readKey;
+
+    printf("Use WASD keys to make a selection:\n");
+    printf("W - Up, A - Left, S - Down, D - Right\n");
+    printf("Press 'q' to quit.\n");
+    printf("Press a key and then Enter: ");
+
+    while(1) {
+        readKey = getchar();
+
+        // Clear input buffer
+        while (getchar() != '\n' && getchar() != EOF);
+
+        switch (readKey) {
+            case 'w':
+            case 'W':
+                printf("Up (W) key pressed\n");
+            return 1; // up
+            case 's':
+            case 'S':
+                printf("Down (S) key pressed\n");
+            return 2; // down
+            case 'a':
+            case 'A':
+                printf("Left (A) key pressed\n");
+            return 3; // left
+            case 'd':
+            case 'D':
+                printf("Right (D) key pressed\n");
+            return 4; // right
+            case 'q':
+            case 'Q':
+                printf("Quitting...\n");
+            return 0;
+            default:
+                printf("Invalid input. Use WASD for direction, Q to quit.\n");
+        }
+        printf("Press a key and then Enter: ");
+    }
+}
+
