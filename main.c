@@ -43,14 +43,16 @@ void generateRandomNumberFromZeroToThree();
 void printBoard();
 void onGameInit(char board[4][4]); // fill board with random tiles with random values
 int playerChoice();
+void turnCalculation(const int *ptrPlayerSelection);
 void checkWinningCondition();
 
 char board[4][4] = {
 {' ', ' ', ' ', ' '},
-{' ', ' ', ' ', ' '},
-{' ', ' ', ' ', ' '},
-{' ', ' ', ' ', ' '},
+{'2', ' ', '2', ' '},
+{'2', ' ', '2', ' '},
+{' ', '2', ' ', ' '},
 };
+
 
 
 int main()
@@ -62,15 +64,17 @@ int main()
     // // printf("%d", (int)board[0][2] - '0' + (int)board[3][1] - '0');
     printBoard(board);
     // printf("%d", playerSelection);
-
     int playerSelection;
+    int *ptrPlayerSelection = &playerSelection;
+
     do {
-        onGameInit(board);
-        playerSelection = playerChoice();
+        // onGameInit(board);
+        *ptrPlayerSelection = playerChoice();
+        turnCalculation(ptrPlayerSelection);
         // Turn calculation function
-        printBoard();
+        printBoard(board);
         // Add your game logic here based on playerSelection
-    } while (playerSelection == 0);
+    } while (*ptrPlayerSelection != 0);
 
     return 0;
 }
@@ -125,7 +129,7 @@ int playerChoice() {
         readKey = getchar();
 
         // Clear input buffer
-        while (getchar() != '\n' && getchar() != EOF);
+        while (getchar() != '\n' && getchar() != EOF) {}
 
         switch (readKey) {
             case 'w':
@@ -152,6 +156,60 @@ int playerChoice() {
                 printf("Invalid input. Use WASD for direction, Q to quit.\n");
         }
         printf("Press a key and then Enter: ");
+    }
+}
+
+void turnCalculation(const int *ptrPlayerSelection) {
+    printf("%d\n", *ptrPlayerSelection);
+
+    // TODO: refactor move directions to the same structure as right
+    int length = 4;
+    for(int col = 0; col < length; col++) {
+        for (int row = 0; row < length; row++) {
+            //up
+            if(*ptrPlayerSelection == 1 && board[row][col] != ' ') {
+                int currentRow = row;
+                while (currentRow > 0 && board[currentRow - 1][col] == ' ') {
+                    board[currentRow - 1][col] = board[currentRow][col]; // reassign square with number to row above it
+                    board[currentRow][col] = ' '; // reassign square back to empty char as number has moved up
+                    currentRow--; // decrement current row to check row above it
+                }
+            }
+            // down
+            if(*ptrPlayerSelection == 2 && board[row][col] != ' ') {
+                int currentRow = row;
+                while (currentRow >= 0 && board[currentRow + 1][col] == ' ') {
+                    board[currentRow + 1][col] = board[currentRow][col];
+                    board[currentRow][col] = ' ';
+                    currentRow--;
+                }
+            }
+            // left
+            if(*ptrPlayerSelection == 3 && board[row][col] != ' ') {
+                int currentCol = col;
+                while (currentCol > 0 && board[row][currentCol - 1] == ' ') {
+                    board[row][currentCol - 1] = board[row][currentCol];
+                    board[row][currentCol] = ' ';
+                    currentCol--;
+                }
+            }
+            // right
+            if(*ptrPlayerSelection == 4) {
+                for(int row = 0; row < length; row++) {
+                    for (int col = length - 2; col >= 0; col--) {
+                        if (board[row][col] != ' ') {
+                            int currentCol = col;
+                            while (currentCol < length - 1 && board[row][currentCol + 1] == ' ') {
+                                board[row][currentCol + 1] = board[row][currentCol];
+                                board[row][currentCol] = ' ';
+                                currentCol++;
+                            }
+                        }
+                    }
+                }
+            }
+            // board[i-1][j] = ' ';
+        }
     }
 }
 
