@@ -164,52 +164,76 @@ void turnCalculation(const int *ptrPlayerSelection) {
 
     // TODO: refactor move directions to the same structure as right
     int length = 4;
-    for(int col = 0; col < length; col++) {
-        for (int row = 0; row < length; row++) {
-            //up
-            if(*ptrPlayerSelection == 1 && board[row][col] != ' ') {
-                int currentRow = row;
-                while (currentRow > 0 && board[currentRow - 1][col] == ' ') {
-                    board[currentRow - 1][col] = board[currentRow][col]; // reassign square with number to row above it
-                    board[currentRow][col] = ' '; // reassign square back to empty char as number has moved up
-                    currentRow--; // decrement current row to check row above it
-                }
-            }
-            // down
-            if(*ptrPlayerSelection == 2 && board[row][col] != ' ') {
-                int currentRow = row;
-                while (currentRow >= 0 && board[currentRow + 1][col] == ' ') {
-                    board[currentRow + 1][col] = board[currentRow][col];
-                    board[currentRow][col] = ' ';
-                    currentRow--;
-                }
-            }
-            // left
-            if(*ptrPlayerSelection == 3 && board[row][col] != ' ') {
-                int currentCol = col;
-                while (currentCol > 0 && board[row][currentCol - 1] == ' ') {
-                    board[row][currentCol - 1] = board[row][currentCol];
-                    board[row][currentCol] = ' ';
-                    currentCol--;
-                }
-            }
-            // right
-            if(*ptrPlayerSelection == 4) {
-                for(int row = 0; row < length; row++) {
-                    for (int col = length - 2; col >= 0; col--) {
-                        if (board[row][col] != ' ') {
-                            int currentCol = col;
-                            while (currentCol < length - 1 && board[row][currentCol + 1] == ' ') {
-                                board[row][currentCol + 1] = board[row][currentCol];
-                                board[row][currentCol] = ' ';
-                                currentCol++;
-                            }
+
+        //up
+        if(*ptrPlayerSelection == 1) {
+            for(int row = 0; row < length; row++) {
+                for (int col = 0; col < length; col++) {
+                    if(board[row][col] != ' ') {
+                        int currentRow = row;
+                        while (currentRow > 0 && board[currentRow - 1][col] == ' ') {
+                            board[currentRow - 1][col] = board[currentRow][col]; // reassign square with number to row above it
+                            board[currentRow][col] = ' ';
+                            currentRow--; // decrement current row to check row above it
+                            // TODO: figure out how to add adjacent matching numbers together
+                            // if(board[currentRow][col] && board[currentRow - 1][col] != ' ') {
+                            //     printf("Total: %d\n", (int)board[currentRow][col] + (int)board[currentRow - 1][col] - '0');
+                            //     (int)board[currentRow][col] + (int)board[currentRow - 1][col];
+                            // }
+                            // reassign square back to empty char as number has moved up
                         }
                     }
                 }
             }
-            // board[i-1][j] = ' ';
+        }
+
+        // down
+        if(*ptrPlayerSelection == 2 ) {
+            for(int row = 0; row < length; row++) {
+                for(int col = length - 1; col >= 0; col --) {
+                    if (board[row][col] != ' ') {
+                        int currentRow = row;
+                        while (currentRow >= 0 && board[currentRow + 1][col] == ' ') {
+                            board[currentRow + 1][col] = board[currentRow][col];
+                            board[currentRow][col] = ' ';
+                            currentRow--;
+                        }
+                    }
+                }
+            }
+        }
+
+        // left
+        if(*ptrPlayerSelection == 3) {
+            for(int row = 0; row < length; row++) {
+                for (int col = 0; col < length; col++) {
+                    if(board[row][col] != ' ') {
+                        int currentCol = col;
+                        while (currentCol > 0 && board[row][currentCol - 1] == ' ') {
+                            board[row][currentCol - 1] = board[row][currentCol];
+                            board[row][currentCol] = ' ';
+                            currentCol--;
+                        }
+                    }
+                }
+            }
+        }
+
+        // right
+        if(*ptrPlayerSelection == 4) {
+            for(int row = 0; row < length; row++) {
+                for (int col = length - 2; col >= 0; col--) {
+                    if (board[row][col] != ' ') {
+                        int currentCol = col;
+                        while (currentCol < length - 1 && board[row][currentCol + 1] == ' ') {
+                            board[row][currentCol + 1] = board[row][currentCol];
+                            board[row][currentCol] = ' ';
+                            currentCol++;
+                        }
+                    }
+                }
+            }
         }
     }
-}
+
 
