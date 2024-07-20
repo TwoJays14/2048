@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <raylib.h>
 #include <time.h>
+#include <stdbool.h>
 #include <conio.h>
 
 #define RAYGUI_IMPLEMENTATION
@@ -31,27 +32,29 @@
  *  6) Generate new random square in available board spaces
  */
 
+// TODO: add functionality to check losing condition
+
 struct Numbers {
     int two;
     int four;
     int eight;
-    int sixteen;
-    int thirtyTwo;
 };
 
-void generateRandomNumberFromZeroToThree();
-void printBoard();
-void onGameInit(char board[4][4]); // fill board with random tiles with random values
+void generateRandomNumberFromZeroToThree(int *randNum);
+void generateRandomNumberFromZeroToTwo(int *randNum);
+void printBoard(int board[4][4]);
+void onGameInit(int board[4][4]); // fill board with random tiles with random values
 int playerChoice();
 void turnCalculation(const int *ptrPlayerSelection);
-void checkWinningCondition();
-// TODO: Change board to int array
+void addNewNumberToBoard(int board[4][4]);
+bool isGameWon();
 
-char board[4][4] = {
-{' ', ' ', ' ', ' '},
-{'2', ' ', '2', ' '},
-{'2', '2', '2', ' '},
-{'2', '2', '2', ' '},
+
+int board[4][4] = {
+{0, 0, 2, 0},
+{0, 0, 0, 0},
+{0, 2, 0, 0},
+{0, 0, 0, 0},
 };
 
 
@@ -63,32 +66,42 @@ int main()
     //
     //
     // // printf("%d", (int)board[0][2] - '0' + (int)board[3][1] - '0');
-    printBoard(board);
     // printf("%d", playerSelection);
     int playerSelection;
     int *ptrPlayerSelection = &playerSelection;
 
+    // start game
+    // onGameInit(board);
+    printBoard(board);
+
     do {
-        // onGameInit(board);
+        // get player choiace
         *ptrPlayerSelection = playerChoice();
-        turnCalculation(ptrPlayerSelection);
         // Turn calculation function
+        turnCalculation(ptrPlayerSelection);
+        // add new number to board
+        addNewNumberToBoard(board);
+        // reprint board
         printBoard(board);
         // Add your game logic here based on playerSelection
-    } while (*ptrPlayerSelection != 0);
+    } while (!isGameWon(board));
+    // } while (*ptrPlayerSelection != 0);
 
-    return 0;
+
+
+        return 0;
+
 }
 
 
-void printBoard(char board[4][4]) {
+void printBoard(int board[4][4]) {
     printf("---------------------\n");
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ') {
+            if (board[i][j] == 0) {
                 printf("|    ");
             } else {
-                printf("| %c  ", board[i][j]);
+                printf("| %3d", board[i][j]);
             }
         }
         printf("|\n");
@@ -97,17 +110,18 @@ void printBoard(char board[4][4]) {
 }
 
 
-void generateRandomNumberFromZeroToThree() {
-    for (int i = 0; i < 1; i++) {
-        const int num = (rand() % (4 - 0)) + 0;
 
-        printf("%d", num);
-    }
+void generateRandomNumberFromZeroToThree(int *randNum) {
+    *randNum = rand() % 4;
 }
 
-void onGameInit(char board[4][4]) {
-    board[0][2] = '2';
-    board[3][1] = '2';
+void generateRandomNumberFromZeroToTwo(int *randNum) {
+    *randNum = rand() % 3;
+}
+
+void onGameInit(int board[4][4]) {
+    board[0][2] = 2;
+    board[3][1] = 2;
 
     // int length = sizeof(board) / sizeof(board[0]);
 
@@ -160,27 +174,26 @@ int playerChoice() {
     }
 }
 
-// TODO: refactor function to accommodate int array
 void turnCalculation(const int *ptrPlayerSelection) {
     printf("%d\n", *ptrPlayerSelection);
 
-    int length = 4;
+    const int length = 4;
 
     //up
     if(*ptrPlayerSelection == 1) {
         for(int row = 0; row < length; row++) {
             for (int col = 0; col < length; col++) {
-                if(board[row][col] != ' ') {
+                if(board[row][col] != 0) {
                     int currentRow = row;
-                    while (currentRow > 0 && board[currentRow - 1][col] == ' ') {
+                    while (currentRow > 0 && board[currentRow - 1][col] == 0) {
                         board[currentRow - 1][col] = board[currentRow][col]; // reassign square with number to row above it
-                        board[currentRow][col] = ' ';
+                        board[currentRow][col] = 0;
                         currentRow--; // decrement current row to check row above it
                     }
                     // Add adjacent numbers together if matching
                     if(board[currentRow - 1][col] == board[currentRow][col]) {
-                        board[currentRow - 1][col] += board[currentRow][col] - '0';
-                        board[currentRow][col] = ' ';
+                        board[currentRow - 1][col] += board[currentRow][col] ;
+                        board[currentRow][col] = 0;
                     }
                 }
             }
@@ -190,18 +203,18 @@ void turnCalculation(const int *ptrPlayerSelection) {
     // down
     if(*ptrPlayerSelection == 2 ) {
         for(int row = 0; row < length; row++) {
-            for(int col = length - 1; col >= 0; col --) {
-                if (board[row][col] != ' ') {
+            for(int col = length - 1; col >= 0; col--) {
+                if (board[row][col] != 0) {
                     int currentRow = row;
-                    while (currentRow >= 0 && board[currentRow + 1][col] == ' ') {
+                    while (currentRow >= 0 && board[currentRow + 1][col] == 0) {
                         board[currentRow + 1][col] = board[currentRow][col];
-                        board[currentRow][col] = ' ';
+                        board[currentRow][col] = 0;
                         currentRow--;
                     }
                     // Add adjacent numbers together if matching
                     if(board[currentRow + 1][col] == board[currentRow][col]) {
-                        board[currentRow + 1][col] += board[currentRow][col] - '0';
-                        board[currentRow][col] = ' ';
+                        board[currentRow + 1][col] += board[currentRow][col];
+                        board[currentRow][col] = 0;
                     }
                 }
             }
@@ -212,17 +225,17 @@ void turnCalculation(const int *ptrPlayerSelection) {
         if(*ptrPlayerSelection == 3) {
             for(int row = 0; row < length; row++) {
                 for (int col = 0; col < length; col++) {
-                    if(board[row][col] != ' ') {
+                    if(board[row][col] != 0) {
                         int currentCol = col;
-                        while (currentCol > 0 && board[row][currentCol - 1] == ' ') {
+                        while (currentCol > 0 && board[row][currentCol - 1] == 0) {
                             board[row][currentCol - 1] = board[row][currentCol];
-                            board[row][currentCol] = ' ';
+                            board[row][currentCol] = 0;
                             currentCol--;
                         }
                         // Add adjacent numbers together if matching
                         if(board[row][currentCol - 1] == board[row][currentCol]) {
-                            board[row][currentCol - 1] += board[row][currentCol] - '0';
-                            board[row][currentCol] = ' ';
+                            board[row][currentCol - 1] += board[row][currentCol] ;
+                            board[row][currentCol] = 0;
                             // reassign square back to empty char as number has moved up
                         }
                     }
@@ -234,17 +247,17 @@ void turnCalculation(const int *ptrPlayerSelection) {
         if(*ptrPlayerSelection == 4) {
             for(int row = 0; row < length; row++) {
                 for (int col = length - 2; col >= 0; col--) {
-                    if (board[row][col] != ' ') {
+                    if (board[row][col] != 0) {
                         int currentCol = col;
-                        while (currentCol < length - 1 && board[row][currentCol + 1] == ' ') {
+                        while (currentCol < length - 1 && board[row][currentCol + 1] == 0) {
                             board[row][currentCol + 1] = board[row][currentCol];
-                            board[row][currentCol] = ' ';
+                            board[row][currentCol] = 0;
                             currentCol++;
                         }
                         // Add adjacent numbers together if matching
                         if(currentCol < length - 1 && board[row][currentCol + 1] == board[row][currentCol]) {
-                            board[row][currentCol + 1] += board[row][currentCol] - '0';
-                            board[row][currentCol] = ' ';
+                            board[row][currentCol + 1] += board[row][currentCol];
+                            board[row][currentCol] = 0;
                             // reassign square back to empty char as number has moved up
                         }
                     }
@@ -252,6 +265,43 @@ void turnCalculation(const int *ptrPlayerSelection) {
             }
         }
     }
+
+void addNewNumberToBoard(int board[4][4]) {
+    struct Numbers numbers;
+    numbers.two = 2;
+    numbers.four = 4;
+    numbers.eight = 8;
+
+    const int numbersArray[3] = {numbers.two, numbers.four, numbers.eight};
+
+
+    int randNum1, randNum2;
+    generateRandomNumberFromZeroToThree(&randNum1);
+    generateRandomNumberFromZeroToThree(&randNum2);
+
+    while (board[randNum1][randNum2] != 0) {
+        generateRandomNumberFromZeroToThree(&randNum1);
+        generateRandomNumberFromZeroToThree(&randNum2);
+    }
+
+    int randIndex;
+    generateRandomNumberFromZeroToTwo(&randIndex);
+    board[randNum1][randNum2] = numbersArray[randIndex];
+
+
+}
+
+bool isGameWon(int board[4][4]) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (board[i][j] == 2048) {
+                printf("Congratulations! You Win!\n");
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 
 
