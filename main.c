@@ -32,7 +32,7 @@
  *  6) Generate new random square in available board spaces
  */
 
-// TODO: add functionality to check losing condition
+// TODO: add logic to add numbers based what numbers are currently on the board i.e. more smaller number make it more likely to add 2 || 4 etc.
 
 struct Numbers {
     int two;
@@ -51,10 +51,10 @@ bool isGameWon();
 
 
 int board[4][4] = {
-{0, 0, 2, 0},
-{0, 0, 0, 0},
-{0, 2, 0, 0},
-{0, 0, 0, 0},
+{0, 4, 8, 16},
+{0, 4, 8, 16},
+{0, 4, 8, 16},
+{0, 4, 8, 16},
 };
 
 
@@ -88,8 +88,8 @@ int main()
     // } while (*ptrPlayerSelection != 0);
 
 
+    return 0;
 
-        return 0;
 
 }
 
@@ -117,19 +117,6 @@ void generateRandomNumberFromZeroToThree(int *randNum) {
 
 void generateRandomNumberFromZeroToTwo(int *randNum) {
     *randNum = rand() % 3;
-}
-
-void onGameInit(int board[4][4]) {
-    board[0][2] = 2;
-    board[3][1] = 2;
-
-    // int length = sizeof(board) / sizeof(board[0]);
-
-    // for(int i = 0; i < 4; i++ ) {
-    //     for(int j = 0; j < 4; j++) {
-    //         printf("%c\n", board[i][j]);
-    //     }
-    // }
 }
 
 int playerChoice() {
@@ -246,7 +233,7 @@ void turnCalculation(const int *ptrPlayerSelection) {
         // right
         if(*ptrPlayerSelection == 4) {
             for(int row = 0; row < length; row++) {
-                for (int col = length - 2; col >= 0; col--) {
+                for (int col = length - 1; col >= 0; col--) {
                     if (board[row][col] != 0) {
                         int currentCol = col;
                         while (currentCol < length - 1 && board[row][currentCol + 1] == 0) {
@@ -292,14 +279,26 @@ void addNewNumberToBoard(int board[4][4]) {
 }
 
 bool isGameWon(int board[4][4]) {
+    int counter = 0;
+
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
+            if (board[i][j] != 0) {
+                counter++;
+            }
             if (board[i][j] == 2048) {
                 printf("Congratulations! You Win!\n");
                 return true;
             }
         }
     }
+
+    if (counter == 16) {
+        printf("You lose!");
+        exit(0);
+    }
+
+
     return false;
 }
 
