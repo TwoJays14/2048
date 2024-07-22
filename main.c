@@ -33,6 +33,10 @@
  */
 
 // TODO: add logic to add numbers based what numbers are currently on the board i.e. more smaller number make it more likely to add 2 || 4 etc.
+// TODO: Maintain top score - verify
+// TODO: Check if combinations are still available when all squares are filled
+// TODO: Implement option to replay game so top score can be preserved
+
 
 struct Numbers {
     int two;
@@ -45,40 +49,38 @@ void generateRandomNumberFromZeroToTwo(int *randNum);
 void printBoard(int board[4][4]);
 void onGameInit(int board[4][4]); // fill board with random tiles with random values
 int playerChoice();
-void turnCalculation(const int *ptrPlayerSelection);
+void turnCalculation(const int *ptrPlayerSelection, int *ptrScore);
 void addNewNumberToBoard(int board[4][4]);
 bool isGameWon();
 
-
 int board[4][4] = {
-{0, 4, 8, 16},
-{0, 4, 8, 16},
-{0, 4, 8, 16},
-{0, 4, 8, 16},
+{0, 0, 2, 0},
+{0, 0, 0, 0},
+{0, 0, 0, 0},
+{0, 2, 0, 0},
 };
-
-
 
 int main()
 {
     srand(time(0));
-    // int playerSelection = playerChoice();
-    //
-    //
-    // // printf("%d", (int)board[0][2] - '0' + (int)board[3][1] - '0');
-    // printf("%d", playerSelection);
+
+    int score = 0;
+    int *ptrScore = &score;
+
+    int topScore = 0;
+
+
     int playerSelection;
     int *ptrPlayerSelection = &playerSelection;
 
-    // start game
-    // onGameInit(board);
     printBoard(board);
 
     do {
         // get player choiace
         *ptrPlayerSelection = playerChoice();
         // Turn calculation function
-        turnCalculation(ptrPlayerSelection);
+        turnCalculation(ptrPlayerSelection, ptrScore);
+        printf("\nCurrent Score: %d\n", *ptrScore);
         // add new number to board
         addNewNumberToBoard(board);
         // reprint board
@@ -87,12 +89,14 @@ int main()
     } while (!isGameWon(board));
     // } while (*ptrPlayerSelection != 0);
 
+    if (*ptrScore > topScore) {
+        topScore = ptrScore;
+    }
 
     return 0;
 
 
 }
-
 
 void printBoard(int board[4][4]) {
     printf("---------------------\n");
@@ -108,8 +112,6 @@ void printBoard(int board[4][4]) {
         printf("---------------------\n");
     }
 }
-
-
 
 void generateRandomNumberFromZeroToThree(int *randNum) {
     *randNum = rand() % 4;
@@ -161,7 +163,7 @@ int playerChoice() {
     }
 }
 
-void turnCalculation(const int *ptrPlayerSelection) {
+void turnCalculation(const int *ptrPlayerSelection, int *ptrScore) {
     printf("%d\n", *ptrPlayerSelection);
 
     const int length = 4;
@@ -179,7 +181,8 @@ void turnCalculation(const int *ptrPlayerSelection) {
                     }
                     // Add adjacent numbers together if matching
                     if(board[currentRow - 1][col] == board[currentRow][col]) {
-                        board[currentRow - 1][col] += board[currentRow][col] ;
+                        board[currentRow - 1][col] += board[currentRow][col];
+                        *ptrScore += board[currentRow][col] * 2;
                         board[currentRow][col] = 0;
                     }
                 }
@@ -201,6 +204,7 @@ void turnCalculation(const int *ptrPlayerSelection) {
                     // Add adjacent numbers together if matching
                     if(board[currentRow + 1][col] == board[currentRow][col]) {
                         board[currentRow + 1][col] += board[currentRow][col];
+                        *ptrScore += board[currentRow][col] * 2;
                         board[currentRow][col] = 0;
                     }
                 }
@@ -222,6 +226,7 @@ void turnCalculation(const int *ptrPlayerSelection) {
                         // Add adjacent numbers together if matching
                         if(board[row][currentCol - 1] == board[row][currentCol]) {
                             board[row][currentCol - 1] += board[row][currentCol] ;
+                            *ptrScore += board[row][currentCol] * 2;
                             board[row][currentCol] = 0;
                             // reassign square back to empty char as number has moved up
                         }
@@ -244,6 +249,7 @@ void turnCalculation(const int *ptrPlayerSelection) {
                         // Add adjacent numbers together if matching
                         if(currentCol < length - 1 && board[row][currentCol + 1] == board[row][currentCol]) {
                             board[row][currentCol + 1] += board[row][currentCol];
+                            *ptrScore += board[row][currentCol] * 2;
                             board[row][currentCol] = 0;
                             // reassign square back to empty char as number has moved up
                         }
@@ -294,7 +300,7 @@ bool isGameWon(int board[4][4]) {
     }
 
     if (counter == 16) {
-        printf("You lose!");
+        printf("Game Over!");
         exit(0);
     }
 
